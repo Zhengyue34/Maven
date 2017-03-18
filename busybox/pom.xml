@@ -1,0 +1,90 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.hpe.itsma</groupId>
+        <artifactId>suite-data</artifactId>
+        <version>${build.version}</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <groupId>com.hpe.itsma.suite</groupId>
+    <artifactId>busybox</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <deploy.url>http://shc-nexus-repo.hpeswlab.net:8080/repository/itsma-snapshots</deploy.url>
+        <build.version>main-SNAPSHOT</build.version>
+        <docker.image.tag>latest</docker.image.tag>
+    </properties>
+
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.0.1</version>
+                <configuration>
+                    <resources>
+                        <resource>
+                            <directory>${project.basedir}/..</directory>
+                            <filtering>true</filtering>
+                            <include>tag.properties</include>
+                        </resource>
+                    </resources>
+                    <outputDirectory>${project.build.directory}</outputDirectory>
+                </configuration>
+           
+                <executions>
+                    <execution>
+                        <id>filter-resources</id>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}</directory>
+                                    <filtering>true</filtering>
+                                    <include>Dockerfile</include>
+                                </resource>
+                            </resources>
+                            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}</directory>
+                                    <filtering>false</filtering>
+                                    <include>busybox.tar.xz</include>
+                                </resource>
+                            </resources>
+                            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <configuration>
+                    <dockerDirectory>${project.build.outputDirectory}</dockerDirectory>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    
+</project>
